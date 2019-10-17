@@ -1,0 +1,29 @@
+node('master') 
+{
+        stage('continuousDownload') 
+        {
+        git 'https://github.com/intelliqittrainings/maven.git'
+        }
+        
+        stage('continuousBuild')
+        {
+        sh label: '', script: 'mvn package'    
+        }
+        stage('continuousDeployment')
+        {
+        sh label: '', script: 'scp /var/lib/jenkins/workspace/scriptedpipeline/webapp/target/webapp.war                       ubuntu@172.31.20.204:/var/lib/tomcat8/webapps/qaenv.war'
+        }
+        stage('continuousTesting')
+        {
+        git 'https://github.com/selenium-saikrishna/FunctionalTesting.git'
+        sh label: '', script: 'java -jar /var/lib/jenkins/workspace/scriptedpipeline/testing.jar'
+        }
+        stage('continuousDelivery')
+        {
+        input message: 'Waiting for Approval from Delivery manager!', submitter: 'priya'    
+        sh label: '', script: 'scp /var/lib/jenkins/workspace/scriptedpipeline/webapp/target/webapp.war
+        ubuntu@172.31.23.1:/var/lib/tomcat8/webapps/testapp.war'
+       
+ }
+
+    
